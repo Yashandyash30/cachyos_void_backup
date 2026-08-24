@@ -1,0 +1,342 @@
+// DMS Window Rules - Managed by DankMaterialShell
+// Do not edit manually - changes may be overwritten
+
+// @id=wr_1775166121460789699 @name=com.mitchellh.ghostty
+window-rule {
+    match app-id="^com.mitchellh.ghostty$"
+    opacity 0.84
+}
+
+// @id=wr_1775166146260605349 @name=org.kde.dolphin
+window-rule {
+    match app-id="^org.kde.dolphin$"
+    opacity 0.80
+}
+
+// @id=wr_1775166300430257637 @name=dev.zed.Zed
+window-rule {
+    match app-id="^dev.zed.Zed$"
+    opacity 0.80
+}
+
+// @id=wr_1775211522839364587 @name=com.mitchellh.ghostty
+window-rule {
+    match app-id="^com.mitchellh.ghostty$"
+    opacity 0.80
+}
+
+// @id=wr_1775214602102094495 @name=spotify
+window-rule {
+    match app-id="^spotify$"
+    opacity 0.80
+}
+
+// @id=wr_1775214632472413214 @name=zen
+window-rule {
+    match app-id="^zen$"
+    opacity 0.80
+}
+
+// @id=wr_1775214649170521715 @name=zen
+window-rule {
+    match app-id="^zen$"
+    opacity 0.90
+}
+
+// @id=wr_1775214796368656233 @name=dev.zed.Zed
+window-rule {
+    match app-id="^dev.zed.Zed$"
+    opacity 0.90
+}
+
+// @id=wr_1775242173286899470 @name=Rule
+window-rule {
+    opacity 0.80
+}
+
+// @id=wr_1775242682739590502 @name=zen
+window-rule {
+    match app-id="^zen$"
+    opacity 1.00
+}
+
+// @id=wr_1775247770566702875 @name=Tk
+window-rule {
+    match app-id="^Tk$"
+    opacity 1.00
+}
+
+// @id=wr_1775299517654888290 @name=Ds9.tcl
+window-rule {
+    match app-id="^Ds9.tcl$"
+    opacity 1.00
+}
+
+// @id=wr_1775337102562178768 @name=nemo
+window-rule {
+    match app-id="^nemo$"
+    opacity 0.99
+}
+
+// @id=wr_1775337116586366171 @name=nemo
+window-rule {
+    match app-id="^nemo$"
+    opacity 0.90
+}
+
+// @id=wr_1775337136373541579 @name=nemo
+window-rule {
+    match app-id="^nemo$"
+    opacity 0.54
+}
+
+// @id=wr_1775337156904649930 @name=nemo
+window-rule {
+    match app-id="^nemo$"
+    opacity 0.14
+}
+
+// @id=wr_1775337264531354394 @name=nemo
+window-rule {
+    match app-id="^nemo$"
+    opacity 0.90
+}
+
+// @id=wr_1775337302072873880 @name=dev.zed.Zed
+window-rule {
+    match app-id="^dev.zed.Zed$"
+    opacity 0.95
+}
+
+// @id=wr_1775341695848648147 @name=code
+window-rule {
+    match app-id="^code$"
+    opacity 0.95
+}
+
+// @id=wr_1775367870645105760 @name=org.quickshell
+window-rule {
+    match app-id="^org.quickshell$"
+    opacity 0.95
+}
+
+// @id=wr_1775368317079339090 @name=org.kde.dolphin
+window-rule {
+    match app-id="^org.kde.dolphin$"
+    opacity 0.95
+}
+
+// @id=wr_1775369976015371261 @name=xdg-desktop-portal-gtk
+window-rule {
+    match app-id="^xdg-desktop-portal-gtk$"
+    opacity 0.93
+}
+
+// @id=wr_1775371521203658450 @name=syncthingtray-qt6
+window-rule {
+    match app-id="^syncthingtray-qt6$"
+    opacity 0.95
+}
+
+// @id=wr_1775629004281212640 @name=waypaper
+window-rule {
+    match app-id="^waypaper$"
+    opacity 0.90
+}
+
+// @id=wr_1775656736167653930 @name=ONLYOFFICE
+window-rule {
+    match app-id="^ONLYOFFICE$"
+    opacity 0.96
+}
+
+// @id=wr_1775742255325324000 @name=code
+window-rule {
+    match app-id="^code$"
+    opacity 1.00
+}
+
+// @id=wr_1775927182321931946 @name=org.cachyos.hello
+window-rule {
+    match app-id="^org.cachyos.hello$"
+    opacity 0.95
+}
+
+// @id=wr_1775927197283083780 @name=org.cachyos.hello
+window-rule {
+    match app-id="^org.cachyos.hello$"
+    opacity 0.90
+}
+
+// @id=wr_1775927215591763919 @name=Alacritty
+window-rule {
+    match app-id="^Alacritty$"
+    opacity 0.90
+}
+
+// @id=wr_1776086134562147246 @name=vdu_controls
+window-rule {
+    match app-id="^vdu_controls$"
+    opacity 0.90
+}
+
+// @id=wr_1776104920567275156 @name=brave-browser
+window-rule {
+    match app-id="^brave-browser$"
+    opacity 1.00
+}
+
+// @id=wr_1776111642697098085 @name=org.inkscape.Inkscape
+window-rule {
+    match app-id="^org.inkscape.Inkscape$"
+    opacity 1.00
+}
+
+// @id=wr_1776111688974693122 @name=org.inkscape.Inkscape
+window-rule {
+    match app-id="^org.inkscape.Inkscape$"
+    open-floating true
+}
+
+// @id=wr_1776447329004693629 @name=vlc
+window-rule {
+    match app-id="^vlc$"
+    opacity 1.00
+}
+
+// @id=wr_1776669101259691666 @name=org.kde.gwenview
+window-rule {
+    match app-id="^org.kde.gwenview$"
+    opacity 0.95
+}
+
+// @id=wr_1776777566429105359 @name=antigravity
+window-rule {
+    match app-id="^antigravity$"
+    opacity 0.95
+}
+
+// @id=wr_1776793202440200238 @name=Rule
+window-rule {
+    opacity 0.95
+}
+
+// @id=wr_1776793408151758686 @name=antigravity
+window-rule {
+    match app-id="^antigravity$"
+    opacity 0.95
+}
+
+// @id=wr_1776793416379537627 @name=antigravity
+window-rule {
+    match app-id="^antigravity$"
+    opacity 1.00
+}
+
+// @id=wr_1776951340803627565 @name=Ds9.tcl
+window-rule {
+    match app-id="^Ds9.tcl$"
+    opacity 1.00
+}
+
+// @id=wr_1777097771651616976 @name=zen
+window-rule {
+    match app-id="^zen$"
+    opacity 1.00
+}
+
+// @id=wr_1779023463038847843 @name=org.kde.gwenview
+window-rule {
+    match app-id="^org.kde.gwenview$"
+    opacity 1.00
+}
+
+// @id=wr_1779045269514878612 @name=brave-browser
+window-rule {
+    match app-id="^brave-browser$"
+    opacity 1.00
+}
+
+// @id=wr_1780061812208097298 @name=ONLYOFFICE
+window-rule {
+    match app-id="^ONLYOFFICE$"
+    opacity 1.00
+}
+
+// @id=wr_1780417912379817396 @name=dev.zed.Zed
+window-rule {
+    match app-id="^dev.zed.Zed$"
+    opacity 0.84
+}
+
+// @id=wr_1780418078399205948 @name=com.mitchellh.ghostty
+window-rule {
+    match app-id="^com.mitchellh.ghostty$"
+    opacity 0.80
+}
+
+// @id=wr_1780418099009281096 @name=com.mitchellh.ghostty
+window-rule {
+    match app-id="^com.mitchellh.ghostty$"
+    opacity 0.14
+}
+
+// @id=wr_1780418111679544134 @name=com.mitchellh.ghostty
+window-rule {
+    match app-id="^com.mitchellh.ghostty$"
+    opacity 0.80
+}
+
+// @id=wr_1780418345875393985 @name=org.kde.dolphin
+window-rule {
+    match app-id="^org.kde.dolphin$"
+    opacity 0.85
+}
+
+// @id=wr_1780418361342704062 @name=zen
+window-rule {
+    match app-id="^zen$"
+    opacity 0.95
+}
+
+// @id=wr_1780418553526496281 @name=zen
+window-rule {
+    match app-id="^zen$"
+    opacity 1.00
+}
+
+// @id=wr_1780418577044455738 @name=zen
+window-rule {
+    match app-id="^zen$"
+    opacity 0.90
+}
+
+// @id=wr_1780419104176151688 @name=brave-browser
+window-rule {
+    match app-id="^brave-browser$"
+    opacity 0.95
+}
+
+// @id=wr_1780419171492401263 @name=brave-browser
+window-rule {
+    match app-id="^brave-browser$"
+    opacity 0.90
+}
+
+// @id=wr_1780419185675334963 @name=brave-browser
+window-rule {
+    match app-id="^brave-browser$"
+    opacity 0.94
+}
+
+// @id=wr_1780419527373736752 @name=brave-dkffkpjdgfaioclfahmdkclcklcimahp-Default
+window-rule {
+    match app-id="^brave-dkffkpjdgfaioclfahmdkclcklcimahp-Default$"
+    opacity 0.85
+}
+
+// @id=wr_1780419586626480774 @name=brave-dkffkpjdgfaioclfahmdkclcklcimahp-Default
+window-rule {
+    match app-id="^brave-dkffkpjdgfaioclfahmdkclcklcimahp-Default$"
+    opacity 0.80
+}
