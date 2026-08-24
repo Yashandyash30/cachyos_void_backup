@@ -51,6 +51,13 @@ Component {
 }
 ```
 
+## Bonus: "Same on all monitors" Toggle
+
+Added a new feature across the plugin files (`MpvPaperWidget.qml`, `MpvPaperSettings.qml`, `MpvPaperDaemon.qml`) that adds a toggle button. When enabled:
+- The monitor selector dropdown is hidden/disabled
+- Any video selected or added to the playlist applies to **all connected monitors** simultaneously
+- The daemon sync function `syncVideosWithData` duplicates the primary monitor's configuration across all other monitors automatically
+
 ## Current status
 
 - **Fork:** https://github.com/Yashandyash30/mpvpaper-plugin
