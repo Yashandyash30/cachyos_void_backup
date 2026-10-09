@@ -155,6 +155,26 @@ if command -v niri &>/dev/null && [ -n "$WAYLAND_DISPLAY" ]; then
     niri msg action reload-config 2>/dev/null || true
 fi
 
+# 5. Configure SDDM Autologin
+echo ""
+read -p "Do you want to configure SDDM Autologin into Niri (as per autologin.md)? (y/N): " -r setup_autologin
+if [[ $setup_autologin =~ ^[Yy]$ ]]; then
+    echo "==> Configuring SDDM Autologin for user $(whoami) into Niri..."
+    sudo mkdir -p /etc/sddm.conf.d
+    sudo tee /etc/sddm.conf.d/autologin.conf > /dev/null << EOF
+[Autologin]
+User=$(whoami)
+Session=niri
+EOF
+    echo "  [✓] Configured /etc/sddm.conf.d/autologin.conf"
+
+    if command -v sddm &>/dev/null; then
+        sudo systemctl disable greetd.service 2>/dev/null || true
+        sudo systemctl enable sddm.service 2>/dev/null || true
+        echo "  [✓] Enabled sddm.service (DMS will lock screen on startup)"
+    fi
+fi
+
 echo ""
 echo "============================================="
 echo "   Restore Completed Successfully!          "
