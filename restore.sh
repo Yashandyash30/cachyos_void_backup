@@ -14,13 +14,7 @@ if [[ $install_pkg =~ ^[Yy]$ ]]; then
     echo "==> Updating system databases..."
     sudo pacman -Sy
 
-    # Handle power-profiles-daemon vs tuned-ppd conflict cleanly:
-    # CachyOS fresh install includes power-profiles-daemon, but our config uses tuned-ppd.
-    # pacman --noconfirm aborts if power-profiles-daemon is present when tuned-ppd is requested.
-    if pacman -Qq power-profiles-daemon &>/dev/null; then
-        echo "==> Removing conflicting power-profiles-daemon to allow tuned-ppd..."
-        sudo pacman -Rdd --noconfirm power-profiles-daemon 2>/dev/null || true
-    fi
+    # Keeping power-profiles-daemon as system power daemon (tuned/tuned-ppd removed from pkglist)
 
     # Read native packages into array
     native_pkgs=()

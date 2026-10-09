@@ -266,8 +266,6 @@ ttf-liberation
 ttf-meslo-nerd
 ttf-opensans
 tumbler
-tuned
-tuned-ppd
 ufw
 ufw-extras
 unrar
