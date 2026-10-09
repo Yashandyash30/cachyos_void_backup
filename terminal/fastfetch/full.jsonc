@@ -1,0 +1,50 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "height": 10,
+    "padding": {
+      "top": 7
+    }
+  },
+  "display": {
+    "separator": " "
+  },
+  "modules": [
+    { "key": "╭──────────╮", "type": "custom" },
+    { "key": "│  USR    │", "type": "title", "format": "{user-name}@{host-name}" },
+    { "key": "├──────────┤", "type": "custom" },
+    { "key": "│  OS     │", "type": "os", "keyColor": "31" },
+    { "key": "│ ├  KRN  │", "type": "kernel", "keyColor": "31" },
+    { "key": "│ ├  PKG  │", "type": "command", "keyColor": "31", "text": "echo \"$(pacman -Qq | wc -l) (Total)\"" },
+    { "key": "│ ├  USR  │", "type": "command", "keyColor": "31", "text": "echo \"$(pacman -Qqe | wc -l) (Explicit)\"" },
+    { "key": "│ ├ 󰒋 SYS  │", "type": "command", "keyColor": "31", "text": "echo \"$(pacman -Qqd | wc -l) (Dependencies)\"" },
+    { "key": "│ ├ 󰣇 AUR  │", "type": "command", "keyColor": "31", "text": "echo \"$(pacman -Qqm | wc -l) (Foreign)\"" },
+    { "key": "│ ├ 󰏗 FLT  │", "type": "command", "keyColor": "31", "text": "echo \"$(flatpak list --app 2>/dev/null | wc -l || echo 0) (Flatpaks)\"" },
+    { "key": "│ └  SHL  │", "type": "shell", "keyColor": "31" },
+    { "key": "├──────────┤", "type": "custom" },
+    { "key": "│  WM     │", "type": "wm", "keyColor": "32" },
+    { "key": "│ ├ 󰏘 THM  │", "type": "wmtheme", "keyColor": "32" },
+    { "key": "│ ├ 󰀻 ICN  │", "type": "icons", "keyColor": "32" },
+    { "key": "│ ├ 󰆿 CUR  │", "type": "cursor", "keyColor": "32" },
+    { "key": "│ ├  TRM  │", "type": "terminal", "keyColor": "32" },
+    { "key": "│ └  FNT  │", "type": "terminalfont", "keyColor": "32" },
+    { "key": "├──────────┤", "type": "custom" },
+    { "key": "│ 󰪥 PC     │", "type": "host", "format": "{5} {1} ({2})", "keyColor": "33" },
+    { "key": "│ ├  CPU  │", "type": "cpu", "format": "{1} ({3}) @ {7}", "keyColor": "33" },
+    { "key": "│ ├ 󰢮 GPU  │", "type": "gpu", "format": "{1} {2} @ {12}", "keyColor": "33" },
+    { "key": "│ ├  RAM  │", "type": "memory", "keyColor": "33" },
+    { "key": "│ ├ 󰓡 SWP  │", "type": "swap", "keyColor": "33" },
+    { "key": "│ ├ 󰋊 DSK  │", "type": "disk", "keyColor": "33" },
+    { "key": "│ └ 󰍹 MON  │", "type": "monitor", "keyColor": "33" },
+    { "key": "├──────────┤", "type": "custom" },
+    { "key": "│  UP     │", "type": "uptime", "keyColor": "34" },
+    { "key": "│ ├ 󰃭 DAT  │", "type": "datetime", "format": "{1}-{3}-{11}", "keyColor": "34" },
+    { "key": "│ └ 󰔠 DAY  │", "type": "command", "keyColor": "34", "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days" },
+    { "key": "├──────────┤", "type": "custom" },
+    { "key": "│ 󰚌 SH     │", "type": "command", "keyColor": "35", "text": "splash=$(hyprctl splash);echo $splash" },
+    { "key": "├──────────┤", "type": "custom" },
+    { "key": "│  COL    │", "type": "custom", "format": "\u001b[90m● \u001b[31m● \u001b[32m● \u001b[33m● \u001b[34m● \u001b[35m● \u001b[36m● \u001b[37m●" },
+    { "key": "╰──────────╯", "type": "custom" }
+  ]
+}
+

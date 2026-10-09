@@ -1,0 +1,27 @@
+{
+  "lockfileVersion": 1,
+  "plugins": {
+    "dankKDEConnect": {
+      "repo": "https://github.com/AvengeMedia/dms-plugins",
+      "path": "DankKDEConnect",
+      "commit": "e774a9756f2a50499c37a5513f28bee4ebe81d73"
+    },
+    "ddcBrightness": {
+      "repo": "https://github.com/smithyyang/dms-brightness-plugin",
+      "commit": "d3221bb267e99f02dd7793b505ece2cbae118623"
+    },
+    "displayMirror": {
+      "repo": "https://github.com/jfchenier/dms-display-mirror",
+      "commit": "92cd44c4fb67834bf71fdd78f83c29df5e0750b2"
+    },
+    "mpvpaper": {
+      "repo": "https://github.com/tokisak1kurum1/mpvpaper-plugin",
+      "commit": "84776f6a7c53c6b3d1d8fde48b2a0b528dd3eedd"
+    },
+    "wallpaperDiscovery": {
+      "repo": "https://github.com/lucyfire/dms-plugins",
+      "path": "wallpaperDiscovery",
+      "commit": "c99ba77c848721fbb8b8c3307638ea10d5dccdd9"
+    }
+  }
+}

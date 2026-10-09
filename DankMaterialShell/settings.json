@@ -1,0 +1,271 @@
+{
+  "currentThemeName": "dynamic",
+  "currentThemeCategory": "dynamic",
+  "customThemeFile": "/home/void/.config/DankMaterialShell/themes/gruvboxMulti/theme.json",
+  "registryThemeVariants": {
+    "gruvboxMulti": {
+      "dark": {
+        "flavor": "classic-hard-dark",
+        "accent": "green"
+      }
+    }
+  },
+  "matugenScheme": "scheme-content",
+  "popupTransparency": 0.57,
+  "widgetBackgroundColor": "sth",
+  "widgetColorMode": "colorful",
+  "cornerRadius": 12,
+  "barElevationEnabled": false,
+  "blurEnabled": true,
+  "blurWallpaperOnOverview": true,
+  "controlCenterWidgets": [
+    {
+      "id": "volumeSlider",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "brightnessSlider",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "wifi",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "bluetooth",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "audioOutput",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "audioInput",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "nightMode",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "darkMode",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "doNotDisturb",
+      "enabled": true,
+      "width": 50
+    },
+    {
+      "id": "plugin_displayMirror",
+      "enabled": true,
+      "width": 50
+    }
+  ],
+  "showWorkspaceIndex": true,
+  "workspaceFollowFocus": true,
+  "showOccupiedWorkspacesOnly": true,
+  "greeterAutoLogin": true,
+  "dankLauncherV2UnloadOnClose": true,
+  "networkPreference": "wifi",
+  "cursorSettings": {
+    "theme": "System Default",
+    "size": 24,
+    "niri": {
+      "hideWhenTyping": false,
+      "hideAfterInactiveMs": 0
+    },
+    "hyprland": {
+      "hideOnKeyPress": false,
+      "hideOnTouch": false,
+      "inactiveTimeout": 0
+    },
+    "dwl": {
+      "cursorHideTimeout": 0
+    }
+  },
+  "monoFontFamily": "Hack",
+  "lockBeforeSuspend": true,
+  "modalDarkenBackground": false,
+  "lockAtStartup": true,
+  "lockPamExternallyManaged": true,
+  "osdAlwaysShowValue": true,
+  "displayProfileAutoSelect": true,
+  "connectedFrameBarStyleBackups": {
+    "default": {
+      "shadowIntensity": 0,
+      "squareCorners": false,
+      "attachToScreenEdge": false,
+      "gothCornersEnabled": false,
+      "borderEnabled": false
+    }
+  },
+  "barConfigs": [
+    {
+      "id": "default",
+      "name": "Main Bar",
+      "enabled": true,
+      "position": 0,
+      "screenPreferences": [
+        "all"
+      ],
+      "showOnLastDisplay": true,
+      "leftWidgets": [
+        {
+          "id": "mpvpaperWallpaper",
+          "enabled": true
+        },
+        {
+          "id": "launcherButton",
+          "enabled": true
+        },
+        {
+          "id": "workspaceSwitcher",
+          "enabled": true
+        },
+        {
+          "id": "tlpControl",
+          "enabled": true
+        }
+      ],
+      "centerWidgets": [
+        "music",
+        "clock",
+        "weather",
+        {
+          "id": "wallpaperDiscovery",
+          "enabled": true
+        },
+        {
+          "id": "tlpPowerProfile",
+          "enabled": true
+        },
+        {
+          "id": "mpvpaper",
+          "enabled": true
+        },
+        {
+          "id": "dankKDEConnect",
+          "enabled": true
+        }
+      ],
+      "rightWidgets": [
+        "systemTray",
+        "clipboard",
+        "cpuUsage",
+        {
+          "id": "memUsage",
+          "enabled": true,
+          "minimumWidth": true,
+          "showSwap": true,
+          "showInGb": true
+        },
+        "notificationButton",
+        "battery",
+        "controlCenterButton",
+        {
+          "id": "ddcBrightness",
+          "enabled": true
+        }
+      ],
+      "spacing": 4,
+      "innerPadding": 4,
+      "bottomGap": 0,
+      "transparency": 1,
+      "widgetTransparency": 0.85,
+      "squareCorners": false,
+      "noBackground": false,
+      "gothCornersEnabled": false,
+      "gothCornerRadiusOverride": false,
+      "gothCornerRadiusValue": 12,
+      "borderEnabled": false,
+      "borderColor": "surfaceText",
+      "borderOpacity": 1,
+      "borderThickness": 1,
+      "fontScale": 1,
+      "autoHide": false,
+      "autoHideDelay": 250,
+      "openOnOverview": false,
+      "visible": true,
+      "popupGapsAuto": true,
+      "popupGapsManual": 4,
+      "maximizeWidgetIcons": false,
+      "maximizeWidgetText": false,
+      "removeWidgetPadding": false,
+      "widgetOutlineEnabled": false,
+      "widgetOutlineColor": "secondary",
+      "widgetOutlineOpacity": 0,
+      "widgetOutlineThickness": 1,
+      "shadowIntensity": 0,
+      "hoverPopouts": false,
+      "maximizeDetection": true,
+      "useOverlayLayer": false,
+      "attachToScreenEdge": false,
+      "batteryColorMode": "level"
+    }
+  ],
+  "desktopClockCustomColor": {
+    "r": 1,
+    "g": 1,
+    "b": 1,
+    "a": 1,
+    "hsvHue": -1,
+    "hsvSaturation": 0,
+    "hsvValue": 1,
+    "hslHue": -1,
+    "hslSaturation": 0,
+    "hslLightness": 1,
+    "valid": true,
+    "rgba": -1
+  },
+  "systemMonitorCustomColor": {
+    "r": 1,
+    "g": 1,
+    "b": 1,
+    "a": 1,
+    "hsvHue": -1,
+    "hsvSaturation": 0,
+    "hsvValue": 1,
+    "hslHue": -1,
+    "hslSaturation": 0,
+    "hslLightness": 1,
+    "valid": true,
+    "rgba": -1
+  },
+  "desktopWidgetInstances": [
+    {
+      "id": "dw_1776267435379_r8swwsmn3",
+      "widgetType": "keybindingCheatSheet",
+      "name": "Keybinding Cheat Sheet",
+      "enabled": true,
+      "config": {
+        "displayPreferences": [
+          "all"
+        ]
+      }
+    }
+  ],
+  "builtInPluginSettings": {
+    "dms_settings_search": {
+      "trigger": "?"
+    },
+    "dms_clipboard_search": {
+      "trigger": "cb"
+    }
+  },
+  "frameEnabled": true,
+  "frameThickness": 4,
+  "frameRounding": 10,
+  "frameOpacity": 0.7,
+  "frameBarSize": 36,
+  "frameBarInsetPadding": 5,
+  "configVersion": 18
+}

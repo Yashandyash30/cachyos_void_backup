@@ -1,0 +1,98 @@
+{
+  "wallpaperDiscovery": {
+    "enabled": true,
+    "api_wallhavencc": "xYWFOvvAgje8jD0Mv54nRnyDuAGlPTjl",
+    "downloadLocation": "~/Pictures/Wallpapers/wallhaven",
+    "api_pexels": "G0m32vf0t81ueMD9rpJ94jh72n1Op3e8mh8ZfSBTjrDKRpaD9W6laLWo",
+    "lastWallpaperUsed": "wallhaven.cc",
+    "api_unsplash": "4k0NTHj0117YY9eMVNjUQXLpamVgdTXxT0rGPGygs7c"
+  },
+  "mpvpaperWallpaper": {
+    "enabled": true,
+    "allMonitors": true,
+    "allMonitorsPath": "/home/void/Videos/Hidamari/blind-angel-moewalls-com.mp4",
+    "customMpvOptions": "--hwdec=vaapi"
+  },
+  "ddcBrightness": {
+    "enabled": true
+  },
+  "displayMirror": {
+    "enabled": true
+  },
+  "tlpControl": {
+    "enabled": false
+  },
+  "tlpPowerProfile": {
+    "enabled": false,
+    "activeProfileId": "power_save"
+  },
+  "mpvpaper": {
+    "enabled": false,
+    "monitorPlaylists": {},
+    "playlistIndices": {},
+    "monitorVideos": {
+      "HDMI-A-1": "/home/void/Videos/Hidamari/os-waves-amd-logo-moewalls-com.mp4",
+      "eDP-1": "/home/void/Videos/Hidamari/058ba91201_wasteland-shelter-post-apocalyptic-campfire.mp4",
+      "DP-2": "/home/void/Videos/Hidamari/camp-fire-dead-by-daylight-moewalls-com.mp4"
+    },
+    "sameOnAllMonitors": true,
+    "videoLibrary": [
+      "/home/void/Videos/Hidamari/a-quiet-night-in-a-rainy-pixel-city-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/anime-girl-watching-sunset-pixel-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/bedroom-dystopian-cyberpunk-city-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/blind-angel-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/blood-dawn-ghost-of-tsushima-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/camp-fire-dead-by-daylight-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/chainsaw-man-denji-manga-scroll-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/chainsaw-man-slideshow-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/cybernetic-girl-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/cyberpunk-urban-city-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/dark-samurai-where-winds-meet-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/horizon-sky-wanderer-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/lonely-homer-starry-night-sky-pixel-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/makima-chains-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/makima-eyes-chainsaw-man-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/miles-morales-in-the-snow-spider-man-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/sakura-falls-arknights-endfield-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/seaside-garden-coffee-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/skeleton-ronin-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/the-crimson-underworld-where-winds-meet-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/viktor-arcane-2-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/silent-katana-forest-samurai-live-wallpaper-wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/pixel-dusk-city.mp4",
+      "/home/void/Videos/Hidamari/cyberpunk-coffee-pixel-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/pokemon-emerald-waterfall-pixel-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/the-last-of-us-sunset-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/minimalist-cat-butterfly-cute-aesthetic-live-wallpaper-wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/itachi-scarlet-forest-pixel-live-wallpaper-wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/itachi-uchiha-silent-resolve-live-wallpaper-wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/black-white-ink-flow-live-wallpaper-wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/aiden-no-sig_wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/silent-garden-night-live-wallpaper-wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/silent-rain-city-live-wallpaper-wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/BMW_M4_Liberty_Walk.mp4",
+      "/home/void/Videos/Hidamari/1773057184.mp4",
+      "/home/void/Videos/Hidamari/8dc43f5035_rick-and-morty-stargazing-live-wallpaper-wallsflow-com.mp4",
+      "/home/void/Videos/Hidamari/sBH2zeUmHmvkCsO_Zombie Invasion Remastered Live Wallpaper.mp4",
+      "/home/void/Videos/Hidamari/goth-thorned-empress-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/TramNight.mp4",
+      "/home/void/Videos/Hidamari/os-waves-amd-logo-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/grasp-of-the-abyss-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/red-ui-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/macos-ventura-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/ghost-rider-skull-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/deep-sea-glow-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/hypnotic-eyes-monochrome-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/ec0ffc08ff_retro-gamers-paradise-famicom.mp4",
+      "/home/void/Videos/Hidamari/058ba91201_wasteland-shelter-post-apocalyptic-campfire.mp4",
+      "/home/void/Videos/Hidamari/TramDay.mp4",
+      "/home/void/Videos/Hidamari/anime-girl-cozy-rain-and-cat-moewalls-com.mp4",
+      "/home/void/Videos/Hidamari/dark-queen-knight-moewalls-com.mp4"
+    ],
+    "allMonitorsVideo": "/home/void/Videos/Hidamari/anime-girl-cozy-rain-and-cat-moewalls-com.mp4"
+  },
+  "dankKDEConnect": {
+    "enabled": true,
+    "selectedDeviceId": "37a7502c79fc47e1b58b6904757e2ffa"
+  }
+}

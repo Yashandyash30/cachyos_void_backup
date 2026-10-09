@@ -1,0 +1,7 @@
+it.mijorus.gearlever
+org.fkoehler.KTailctl
+org.freedesktop.Platform.codecs-extra
+org.freedesktop.Platform.GL.default
+org.gnome.Platform
+org.gtk.Gtk3theme.adw-gtk3-dark
+org.kde.Platform
