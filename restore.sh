@@ -14,27 +14,86 @@ if [[ $install_pkg =~ ^[Yy]$ ]]; then
     echo "==> Updating system databases..."
     sudo pacman -Sy
 
-    echo "==> Installing Native packages (excluding Nvidia)..."
-    if [ -f pkglist/packages-native.txt ]; then
-        sudo pacman -S --needed --noconfirm - < pkglist/packages-native.txt || true
+    # Handle power-profiles-daemon vs tuned-ppd conflict cleanly:
+    # CachyOS fresh install includes power-profiles-daemon, but our config uses tuned-ppd.
+    # pacman --noconfirm aborts if power-profiles-daemon is present when tuned-ppd is requested.
+    if pacman -Qq power-profiles-daemon &>/dev/null; then
+        echo "==> Removing conflicting power-profiles-daemon to allow tuned-ppd..."
+        sudo pacman -Rdd --noconfirm power-profiles-daemon 2>/dev/null || true
     fi
 
-    echo "==> Installing AUR packages..."
-    if [ -f pkglist/packages-aur.txt ]; then
-        if command -v paru &>/dev/null; then
-            paru -S --needed --noconfirm - < pkglist/packages-aur.txt || true
-        elif command -v yay &>/dev/null; then
-            yay -S --needed --noconfirm - < pkglist/packages-aur.txt || true
-        else
-            echo "Neither paru nor yay found! Please install paru first."
+    # Read native packages into array
+    native_pkgs=()
+    if [ -f pkglist/packages-native.txt ]; then
+        while IFS= read -r line || [ -n "$line" ]; do
+            pkg=$(echo "$line" | sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            [ -n "$pkg" ] && native_pkgs+=("$pkg")
+        done < pkglist/packages-native.txt
+    fi
+
+    if [ ${#native_pkgs[@]} -gt 0 ]; then
+        echo "==> Installing ${#native_pkgs[@]} Native packages..."
+        if ! sudo pacman -S --needed --noconfirm "${native_pkgs[@]}"; then
+            echo "==> Batch install hit an error. Retrying individual packages..."
+            for pkg in "${native_pkgs[@]}"; do
+                sudo pacman -S --needed --noconfirm "$pkg" 2>/dev/null || echo "  [!] Skipped: $pkg"
+            done
         fi
     fi
 
-    echo "==> Installing Flatpaks..."
+    # Ensure AUR helper (paru) exists; CachyOS has it in its official repos
+    if ! command -v paru &>/dev/null && ! command -v yay &>/dev/null; then
+        echo "==> AUR helper not found. Installing paru from CachyOS repository..."
+        sudo pacman -S --needed --noconfirm paru || true
+    fi
+
+    # Read AUR packages into array
+    aur_pkgs=()
+    if [ -f pkglist/packages-aur.txt ]; then
+        while IFS= read -r line || [ -n "$line" ]; do
+            pkg=$(echo "$line" | sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            [ -n "$pkg" ] && aur_pkgs+=("$pkg")
+        done < pkglist/packages-aur.txt
+    fi
+
+    if [ ${#aur_pkgs[@]} -gt 0 ]; then
+        echo "==> Installing ${#aur_pkgs[@]} AUR packages..."
+        AUR_HELPER=""
+        command -v paru &>/dev/null && AUR_HELPER="paru"
+        [ -z "$AUR_HELPER" ] && command -v yay &>/dev/null && AUR_HELPER="yay"
+
+        if [ -n "$AUR_HELPER" ]; then
+            if ! "$AUR_HELPER" -S --needed --noconfirm "${aur_pkgs[@]}"; then
+                echo "==> Batch AUR install hit an error. Retrying individual AUR packages..."
+                for apkg in "${aur_pkgs[@]}"; do
+                    "$AUR_HELPER" -S --needed --noconfirm "$apkg" 2>/dev/null || echo "  [!] Skipped AUR package: $apkg"
+                done
+            fi
+        else
+            echo "  [!] Neither paru nor yay is available. Skipping AUR packages."
+        fi
+    fi
+
+    # Flatpaks
     if [ -f pkglist/flatpaks.txt ] && command -v flatpak &>/dev/null; then
-        while read -r app; do
-            [ -n "$app" ] && flatpak install -y flathub "$app" || true
+        echo "==> Installing Flatpaks..."
+        while IFS= read -r app || [ -n "$app" ]; do
+            app_clean="$(echo "$app" | tr -d '\r\n[:space:]')"
+            [ -n "$app_clean" ] && flatpak install -y flathub "$app_clean" 2>/dev/null || true
         done < pkglist/flatpaks.txt
+    fi
+fi
+
+# Miniforge3 (conda / mamba) check
+if [ ! -d "$HOME/miniforge3" ]; then
+    echo ""
+    read -p "Miniforge3 (conda/mamba) is not installed in ~/miniforge3. Download & install now? (y/N): " -r install_mamba
+    if [[ $install_mamba =~ ^[Yy]$ ]]; then
+        echo "==> Downloading and installing Miniforge3..."
+        curl -L -o /tmp/Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
+        bash /tmp/Miniforge3.sh -b -p "$HOME/miniforge3"
+        rm -f /tmp/Miniforge3.sh
+        echo "  [✓] Miniforge3 installed to $HOME/miniforge3"
     fi
 fi
 
@@ -44,6 +103,10 @@ mkdir -p ~/.config
 
 # Niri
 if [ -d "$BACKUP_DIR/niri" ]; then
+    if [ -d ~/.config/niri ] && [ ! -L ~/.config/niri ]; then
+        echo "  [*] Backing up existing ~/.config/niri directory..."
+        mv ~/.config/niri ~/.config/niri.bak_$(date +%s)
+    fi
     ln -sfn "$BACKUP_DIR/niri" ~/.config/niri
     echo "  [✓] Linked ~/.config/niri"
 fi
@@ -51,7 +114,7 @@ fi
 # DankMaterialShell
 if [ -d "$BACKUP_DIR/DankMaterialShell" ]; then
     mkdir -p ~/.config/DankMaterialShell
-    rsync -av "$BACKUP_DIR/DankMaterialShell/" ~/.config/DankMaterialShell/
+    rsync -av --no-owner --no-group "$BACKUP_DIR/DankMaterialShell/" ~/.config/DankMaterialShell/
     echo "  [✓] Restored ~/.config/DankMaterialShell"
 fi
 
@@ -86,8 +149,20 @@ if [ -d "$BACKUP_DIR/environment.d" ]; then
     echo "  [✓] Restored ~/.config/environment.d"
 fi
 
+# 3. Enable Desktop Services
+echo "==> Enabling desktop and user services..."
+systemctl --user daemon-reload
+systemctl --user enable --now dms.service 2>/dev/null || true
+systemctl --user enable --now syncthing.service 2>/dev/null || true
+
+# 4. Live Reload Compositor
+if command -v niri &>/dev/null && [ -n "$WAYLAND_DISPLAY" ]; then
+    echo "==> Reloading Niri configuration live..."
+    niri msg action reload-config 2>/dev/null || true
+fi
+
 echo ""
 echo "============================================="
 echo "   Restore Completed Successfully!          "
-echo "   Please log out and log back in.          "
+echo "   DankMaterialShell & Niri are active.     "
 echo "============================================="

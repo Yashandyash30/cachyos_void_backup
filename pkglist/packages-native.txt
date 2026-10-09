@@ -65,6 +65,7 @@ cmake
 cpptrace
 cpupower
 cryptsetup
+crun
 cups-pk-helper
 device-mapper
 dgop
@@ -73,6 +74,7 @@ distrobox
 dmemcg-booster
 dmidecode
 dmraid
+dms-shell
 dolphin
 dosfstools
 duf
@@ -141,6 +143,7 @@ lib32-vulkan-icd-loader
 lib32-vulkan-radeon
 libdvdcss
 libgsf
+libnautilus-extension
 libopenraw
 libva-utils
 limine
@@ -171,6 +174,7 @@ mtools
 nano
 nano-syntax-highlighting
 nemo
+netavark
 netctl
 networkmanager
 networkmanager-openvpn
@@ -219,6 +223,7 @@ python
 python-defusedxml
 python-packaging
 qbittorrent
+quickshell
 qt5-quickcontrols2
 qt5ct
 qt6-wayland
@@ -254,6 +259,7 @@ tcpdump
 testdisk
 texinfo
 texlive-meta
+totem-pl-parser
 ttf-bitstream-vera
 ttf-dejavu
 ttf-liberation
@@ -284,6 +290,7 @@ which
 wireplumber
 wl-mirror
 wpa_supplicant
+wtype
 xdg-desktop-portal-gnome
 xdg-desktop-portal-wlr
 xdg-user-dirs

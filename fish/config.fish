@@ -34,7 +34,9 @@ set -gx MAMBA_ROOT_PREFIX "/home/void/miniforge3"
 
 # This line runs the mamba setup script specifically tailored for the fish shell.
 # The pipe (|) feeds the output into the 'source' command to apply it immediately.
-$MAMBA_EXE shell hook --shell fish --root-prefix $MAMBA_ROOT_PREFIX | source
+if test -x "$MAMBA_EXE"
+    $MAMBA_EXE shell hook --shell fish --root-prefix $MAMBA_ROOT_PREFIX | source
+end
 # <<< mamba initialize <<<
 
 
@@ -161,7 +163,9 @@ end
 # Wayland Display Bridge for Legacy X11/Distrobox
 # -----------------------------------------------------
 # Suppress output so it doesn't spam the terminal on startup
-xhost +si:localuser:void > /dev/null 2>&1
+if type -q xhost
+    xhost +si:localuser:void > /dev/null 2>&1
+end
 
 # -----------------------------------------------------
 # Astrophysics Pipeline (astro-box container)

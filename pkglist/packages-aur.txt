@@ -13,7 +13,6 @@ ksmbd-tools
 linux-wifi-hotspot
 qdirstat
 qt6ct-kde
-quickshell-git
 speedtest-go
 stacer-bin
 visual-studio-code-bin
