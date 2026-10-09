@@ -18,6 +18,7 @@ mkdir -p gtk terminal environment.d
 rsync -av --delete /home/void/.config/gtk-3.0/ gtk/gtk-3.0/
 rsync -av --delete /home/void/.config/gtk-4.0/ gtk/gtk-4.0/
 rsync -av --delete /home/void/.config/alacritty/ terminal/alacritty/
+[ -d /home/void/.config/ghostty ] && rsync -av --delete /home/void/.config/ghostty/ terminal/ghostty/
 rsync -av --delete /home/void/.config/cava/ terminal/cava/
 rsync -av --delete /home/void/.config/fastfetch/ terminal/fastfetch/
 rsync -av --delete /home/void/.config/btop/ terminal/btop/

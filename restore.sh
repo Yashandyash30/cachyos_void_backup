@@ -42,8 +42,7 @@ fi
 echo "==> Restoring desktop, window manager, and shell configurations..."
 mkdir -p ~/.config
 
-# Niri (symlink to backup repo or copy if preferred)
-mkdir -p ~/.config
+# Niri
 if [ -d "$BACKUP_DIR/niri" ]; then
     ln -sfn "$BACKUP_DIR/niri" ~/.config/niri
     echo "  [✓] Linked ~/.config/niri"
@@ -73,10 +72,11 @@ fi
 # Terminal & System tools
 if [ -d "$BACKUP_DIR/terminal" ]; then
     [ -d "$BACKUP_DIR/terminal/alacritty" ] && rsync -av "$BACKUP_DIR/terminal/alacritty/" ~/.config/alacritty/
+    [ -d "$BACKUP_DIR/terminal/ghostty" ] && rsync -av "$BACKUP_DIR/terminal/ghostty/" ~/.config/ghostty/
     [ -d "$BACKUP_DIR/terminal/cava" ] && rsync -av "$BACKUP_DIR/terminal/cava/" ~/.config/cava/
     [ -d "$BACKUP_DIR/terminal/fastfetch" ] && rsync -av "$BACKUP_DIR/terminal/fastfetch/" ~/.config/fastfetch/
     [ -d "$BACKUP_DIR/terminal/btop" ] && rsync -av "$BACKUP_DIR/terminal/btop/" ~/.config/btop/
-    echo "  [✓] Restored Alacritty, Cava, Fastfetch, and Btop"
+    echo "  [✓] Restored Alacritty, Ghostty, Cava, Fastfetch, and Btop"
 fi
 
 # Environment
