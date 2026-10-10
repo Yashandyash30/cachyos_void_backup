@@ -182,3 +182,14 @@ alias daomaster="distrobox enter astro-box -- bash -c '~/dao2/ndaomaster'"
 
 
 alias laundry="cd ~/laundry-tracker && source venv/bin/activate.fish"
+
+
+# Antigravity CLI
+fish_add_path ~/.local/bin
+
+# Antigravity CLI aliases (Normal and YOLO modes)
+alias antigravity="agy"
+alias antigravity-cli="agy"
+alias agy-yolo="agy --dangerously-skip-permissions"
+alias antigravity-cli-yolo="agy --dangerously-skip-permissions"
+alias antigravity-yolo="agy --dangerously-skip-permissions"
