@@ -58,6 +58,7 @@ VIRTUAL_ENV="$INSTALL_DIR/venv" uv pip install \
 
 echo "Installing ComfyUI base dependencies..."
 VIRTUAL_ENV="$INSTALL_DIR/venv" uv pip install -r requirements.txt
+VIRTUAL_ENV="$INSTALL_DIR/venv" uv pip install comfyui-manager
 
 # 5. Install Essential Custom Nodes
 echo -e "\n\033[1;33m[5/7] Installing Essential Custom Nodes (Manager, GGUF, Impact-Pack, etc.)...\033[0m"
@@ -156,6 +157,39 @@ try:
 except Exception as e:
     logging.warning(f"[Niri-Guard] Could not configure AMD attention/weight ratios: {e}")
 
+# --- Model Type Classification Helpers ---
+def is_text_encoder(patcher):
+    if patcher is None:
+        return False
+    is_clip = getattr(patcher, "is_clip", False)
+    model_obj = getattr(patcher, "model", None)
+    model_name = model_obj.__class__.__name__ if model_obj is not None else ""
+    return is_clip or any(k in model_name.lower() for k in ["clip", "temodel", "textencoder", "t5", "qwen"])
+
+def is_vae(patcher):
+    if patcher is None:
+        return False
+    model_obj = getattr(patcher, "model", None)
+    model_name = model_obj.__class__.__name__ if model_obj is not None else ""
+    return any(k in model_name.lower() for k in ["vae", "autoencod", "first_stage", "autoencodingengine", "taesd"])
+
+def is_diffusion_model(patcher):
+    if patcher is None:
+        return False
+    m = getattr(patcher, "model", None)
+    if m is None:
+        return False
+    try:
+        import comfy.model_base
+        if isinstance(m, comfy.model_base.BaseModel):
+            return True
+    except Exception:
+        pass
+    if is_text_encoder(patcher) or is_vae(patcher):
+        return False
+    name = m.__class__.__name__.lower()
+    return any(k in name for k in ["diffusion", "unet", "flux", "flow", "dit", "hunyuan"])
+
 # 5. FIX STRANDED TEXT ENCODER VRAM
 try:
     import comfy.model_management
@@ -163,14 +197,15 @@ try:
     _orig_model_unload = comfy.model_management.LoadedModel.model_unload
 
     def _guarded_model_unload(self, memory_to_free=None, unpatch_weights=True):
-        is_clip = getattr(self.model, "is_clip", False)
-        model_obj = getattr(self.model, "model", None)
-        model_name = model_obj.__class__.__name__ if model_obj is not None else ""
-        is_text_encoder = is_clip or any(k in model_name.lower() for k in ["clip", "temodel", "textencoder", "t5", "qwen"])
-
-        if is_text_encoder and memory_to_free is not None:
-            logging.info(f"[Niri-Guard] Fully unloading inactive text encoder '{model_name}' from VRAM (frees 100% VRAM for KSampler).")
-            memory_to_free = None
+        if is_text_encoder(self.model) and memory_to_free is not None:
+            patcher = self.model
+            if patcher is not None:
+                loaded_vram = getattr(patcher, "model_loaded_weight_memory", patcher.loaded_size())
+                if loaded_vram > 0:
+                    model_name = getattr(getattr(patcher, "model", None), "__class__", type(None)).__name__
+                    logging.info(f"[Niri-Guard] Offloading inactive text encoder '{model_name}' to CPU RAM (frees 100% VRAM for KSampler).")
+                    patcher.partially_unload(patcher.offload_device, 1e30)
+            return False
 
         return _orig_model_unload(self, memory_to_free=memory_to_free, unpatch_weights=unpatch_weights)
 
@@ -179,23 +214,31 @@ try:
 except Exception as e:
     logging.warning(f"[Niri-Guard] Could not patch model_unload: {e}")
 
-# 6. AUTO-EVICT DORMANT MODELS & FORCE FULL GPU LOAD FOR GGUF
+# 6. AUTO-EVICT DORMANT MODELS ON WORKFLOW SWITCH & HEADROOM PROTECTION FOR SAMPLING/VAE
 try:
+    import comfy.model_base
     import comfy.model_management
-
-    def is_diffusion_model(patcher):
-        m = getattr(patcher, "model", None)
-        if m is None:
-            return False
-        name = m.__class__.__name__.lower()
-        is_clip = getattr(patcher, "is_clip", False) or any(k in name for k in ["clip", "temodel", "textencoder", "t5", "qwen"])
-        is_vae = any(k in name for k in ["vae", "autoencoder"])
-        return not is_clip and not is_vae
 
     _orig_load_models_gpu = comfy.model_management.load_models_gpu
 
     def _guarded_load_models_gpu(models, memory_required=0, force_patch_weights=False, minimum_memory_required=None, force_full_load=False):
         incoming_diffusion = [m for m in models if is_diffusion_model(m)]
+        incoming_vae = [m for m in models if is_vae(m)]
+
+        # A. Offload dormant text encoder if large (>= 2.5GB, e.g. Qwen/T5) or if VRAM is tight (< 3GB free)
+        for loaded_lm in comfy.model_management.current_loaded_models:
+            if is_text_encoder(loaded_lm.model) and loaded_lm.model not in models:
+                p = loaded_lm.model
+                if p is not None and getattr(p, "loaded_size", lambda: 0)() > 0:
+                    te_sz = p.loaded_size()
+                    dev = getattr(p, "load_device", comfy.model_management.get_torch_device())
+                    free_v = comfy.model_management.get_free_memory(dev)
+                    if te_sz >= 2500 * 1024 * 1024 or free_v < 3000 * 1024 * 1024:
+                        te_name = getattr(getattr(p, "model", None), "__class__", type(None)).__name__
+                        logging.info(f"[Niri-Guard] Offloading dormant text encoder '{te_name}' to CPU RAM (frees {te_sz / (1024*1024):.1f}MB VRAM).")
+                        p.partially_unload(p.offload_device, 1e30)
+
+        # B. Workflow model switch guard: evict old architecture diffusion model if switching
         if len(incoming_diffusion) > 0:
             incoming = incoming_diffusion[0]
             for i in range(len(comfy.model_management.current_loaded_models) - 1, -1, -1):
@@ -204,7 +247,7 @@ try:
                     try:
                         if not incoming.is_clone(loaded_lm.model):
                             model_name = getattr(loaded_lm.model.model, "__class__", type(None)).__name__
-                            logging.info(f"[Niri-Guard] Evicting dormant diffusion model '{model_name}' from RAM.")
+                            logging.info(f"[Niri-Guard] Workflow switch detected: Evicting dormant diffusion model '{model_name}' from RAM.")
                             evicted = comfy.model_management.current_loaded_models.pop(i)
                             evicted.model.detach(unpatch_all=True)
                     except Exception:
@@ -218,14 +261,15 @@ try:
             except Exception:
                 pass
 
+        # C. Enforce 100% full GPU load for ANY model that fits in VRAM (SDXL, SD1.5, Flux, GGUF)
         for m in models:
-            if "gguf" in m.__class__.__name__.lower() or hasattr(m, "mmap_released"):
-                device = getattr(m, "load_device", comfy.model_management.get_torch_device())
-                free_vram = comfy.model_management.get_free_memory(device)
-                model_sz = m.model_size()
-                if model_sz + 1500 * 1024 * 1024 <= free_vram:
-                    force_full_load = True
-                    logging.info(f"[Niri-Guard] GGUF model fits in VRAM ({model_sz / (1024*1024):.1f}MB <= {free_vram / (1024*1024):.1f}MB). Enforcing 100% full GPU load.")
+            dev = getattr(m, "load_device", comfy.model_management.get_torch_device())
+            free_v = comfy.model_management.get_free_memory(dev)
+            m_sz = m.model_size()
+            if m_sz + 1000 * 1024 * 1024 <= free_v:
+                force_full_load = True
+                m_name = getattr(getattr(m, "model", None), "__class__", type(None)).__name__
+                logging.info(f"[Niri-Guard] Model '{m_name}' fits in VRAM ({m_sz / (1024*1024):.1f}MB <= {free_v / (1024*1024):.1f}MB). Enforcing 100% full GPU load.")
                 break
 
         return _orig_load_models_gpu(models, memory_required=memory_required, force_patch_weights=force_patch_weights,
@@ -288,11 +332,12 @@ source venv/bin/activate
 
 # --- AMD RDNA 4 & ROCm 7.2 Optimizations ---
 export HSA_ENABLE_SDMA=0
+export HSA_ENABLE_INTERRUPT=1
 export TORCH_BLAS_PREFER_HIPBLASLT=1
 export TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
 export MIOPEN_FIND_MODE=FAST
-export PYTORCH_ALLOC_CONF=garbage_collection_threshold:0.8,max_split_size_mb:512
-export PYTORCH_CUDA_ALLOC_CONF=garbage_collection_threshold:0.8,max_split_size_mb:512
+export PYTORCH_ALLOC_CONF=garbage_collection_threshold:0.8
+export PYTORCH_CUDA_ALLOC_CONF=garbage_collection_threshold:0.8
 
 TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || true)
 LOCAL_IP=$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{print $7}')

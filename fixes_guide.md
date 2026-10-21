@@ -10,6 +10,9 @@ This guide consolidates all diagnostic findings, fixes, and setups configured on
 
 1. When WARP connected, internet and local access dropped because local subnet routes and Tailscale traffic were swallowed by the tunnel.
 2. `/etc/resolv.conf` was a static file instead of a symlink, causing `systemd-resolved` to operate in `foreign` mode. This triggered Tailscale warnings (`systemd-resolved and NetworkManager are wired together incorrectly`) and caused WARP to overwrite `/etc/resolv.conf`, breaking all domain name resolution.
+3. After reboot, Tailscale was stuck logged out (`unexpected state: NoState` with `register request ... context deadline exceeded`). Cloudflare WARP installed policy routing rule `5207: not from all fwmark 0x100cf lookup 65743` which took precedence over Tailscale's bypass rule `5210: from all fwmark 0x80000/0xff0000 lookup main` (and custom rule `5208`). Outbound Tailscale control plane traffic bound to the physical NIC IP was intercepted and dropped by the `CloudflareWARP` tunnel.
+4. Local network router advertised an IPv6 DNS server (`fe80::360a:33ff:fe5e:bfe6`) via Router Advertisements (RA) that sinkholed `controlplane.tailscale.com` to `192.0.2.1` (RFC 5737 dummy address), causing Tailscale login failure: `fetch control key: Get "https://controlplane.tailscale.com/key?v=148": dial tcp 192.0.2.1:443: connect: network is unreachable`.
+5. Exiting Cloudflare WARP GUI tray spawned a new instance automatically because `/usr/lib/systemd/user/warp-taskbar.service` was configured with `Restart=always`.
 
 ### Resolution Steps
 
@@ -25,10 +28,13 @@ warp-cli tunnel ip add-range 172.21.0.0/22
 # Exclude Tailscale hosts from the tunnel
 warp-cli tunnel host add ts.net
 warp-cli tunnel host add tailscale.com
+warp-cli tunnel host add tailscale.net
+warp-cli tunnel host add tailscale.io
 
 # Route Tailscale MagicDNS domains through local resolver instead of Cloudflare DNS
 warp-cli dns fallback add ts.net
 warp-cli dns fallback add tailscale.net
+warp-cli dns fallback add tailscale.com
 ```
 
 #### 2. Switch `/etc/resolv.conf` to `systemd-resolved` Stub Mode
@@ -37,6 +43,59 @@ warp-cli dns fallback add tailscale.net
 sudo rm -f /etc/resolv.conf
 sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 sudo systemctl restart NetworkManager systemd-resolved
+```
+
+#### 3. Fix Policy Routing Priority on Boot (`tailscale-warp-rule.service`)
+
+Create `/etc/systemd/system/tailscale-warp-rule.service` so Tailscale's socket mark (`0x80000`) is evaluated at priority `5206` before WARP's `5207`:
+
+```ini
+[Unit]
+Description=Tailscale and Cloudflare WARP routing compatibility fix
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c "ip rule del pref 5206 2>/dev/null || true; ip rule add pref 5206 fwmark 0x80000/0xff0000 lookup main; ip -6 rule del pref 5206 2>/dev/null || true; ip -6 rule add pref 5206 fwmark 0x80000/0xff0000 lookup main"
+ExecStop=/bin/sh -c "ip rule del pref 5206 2>/dev/null || true; ip -6 rule del pref 5206 2>/dev/null || true"
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start the service (and clean up any stale `5208` rule):
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now tailscale-warp-rule.service
+sudo ip rule del pref 5208 2>/dev/null || true
+sudo ip -6 rule del pref 5208 2>/dev/null || true
+```
+
+#### 4. Disable IPv6 Automatic DNS from Router (Prevent 192.0.2.1 Sinkhole)
+
+Block local router RA from injecting its IPv6 DNS resolver into systemd-resolved:
+
+```bash
+nmcli connection modify "Wired connection 1" ipv6.ignore-auto-dns yes
+nmcli device reapply enp5s0
+```
+
+#### 5. Disable Auto-Respawn on Exit for Cloudflare WARP Taskbar
+
+Create `~/.config/systemd/user/warp-taskbar.service.d/override.conf`:
+
+```ini
+[Service]
+Restart=no
+```
+
+Apply changes:
+
+```bash
+systemctl --user daemon-reload
 ```
 
 #### Verification
@@ -50,7 +109,14 @@ ls -l /etc/resolv.conf
 resolvectl status | grep "resolv.conf mode"
 # Expected: resolv.conf mode: stub
 
-# Verify Tailscale health warning is cleared
+# Verify priority 5206 rule is active
+ip rule show pref 5206
+# Expected: 5206: from all fwmark 0x80000/0xff0000 lookup main
+
+# Verify controlplane.tailscale.com resolves to real Tailscale IPs (not 192.0.2.1)
+resolvectl query controlplane.tailscale.com
+
+# Verify Tailscale status is active and healthy
 tailscale status
 ```
 

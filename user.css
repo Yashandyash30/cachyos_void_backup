@@ -1,0 +1,62 @@
+/* Tablet touch & zoom optimization for entire ComfyUI interface */
+html, body {
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Allow touch scrolling inside menus, sidebars, and dialogs without triggering page-zoom */
+.side-tool-bar,
+.comfy-menu,
+.p-sidebar,
+.p-dialog,
+.p-drawer,
+.comfy-modal,
+.comfy-vue-side-bar,
+.litegraph-dialog,
+.graphdialog,
+.litecontextmenu,
+.litemenubar-panel,
+.litemenu-entry,
+[role="dialog"],
+[role="menu"] {
+  touch-action: pan-y !important;
+  overscroll-behavior: contain !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Ensure context menu items are easily tappable and receive touches cleanly */
+.litecontextmenu,
+.litemenubar-panel {
+  touch-action: pan-y !important;
+  pointer-events: auto !important;
+}
+
+.litecontextmenu .litemenu-entry {
+  touch-action: manipulation !important;
+  pointer-events: auto !important;
+  min-height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 4px 12px !important;
+}
+
+/* Allow normal text selection inside input fields when deliberately focused */
+input, textarea {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -webkit-touch-callout: default !important;
+}
+
+/* Canvas captures raw multi-touch gestures and blocks text highlight */
+#graph-canvas, canvas, .lgraph-node {
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Stop mobile browsers (Safari / Chrome / IceRaven) from auto-zooming page on input focus */
+input, textarea, select, .litegraph-dialog input, .graphdialog input {
+  font-size: 16px !important;
+}
