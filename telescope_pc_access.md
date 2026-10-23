@@ -47,21 +47,30 @@ Windows File Sharing (SMB on port `445`) allows pulling and pushing data files (
 * **Workgroup / Domain:** `WORKGROUP` *(or leave blank)*
 
 ### Access via Dolphin (GUI):
-1. In Dolphin, press `Ctrl + L` and enter:
+
+> [!IMPORTANT]
+> **Avoid "Timeout on server 172.20.2.42":**
+> Under Wayland compositors (such as Niri), KWallet/Secret Service prompts may fail or lose focus (`org.freedesktop.Secret.Collection not found`). If credentials are not sent immediately, Windows 7 drops the unauthenticated cross-subnet connection, resulting in a **"Timeout on server 172.20.2.42"** error. Always pass credentials inline or pin to Places.
+
+1. In Dolphin, press `Ctrl + L` and enter the full URL with inline credentials:
    ```
-   smb://172.20.2.42/TelescopeData
+   smb://transfer:123456@172.20.2.42/TelescopeData
    ```
-2. Enter the credentials when prompted and check **"Remember password"**.
-3. **Pin permanently:** Right-click inside the folder or address bar and click **"Add to Places"** to keep it in Dolphin's sidebar under **Remote**.
+2. **Pin permanently to Sidebar:** Once opened, right-click the folder background or address breadcrumb and select **"Add to Places"** (or add directly to `~/.local/share/user-places.xbel`) so it stays under **Places / Remote** without re-typing.
 
 ### Access via Linux Terminal / CLI:
 ```bash
 # Interactive SMB prompt
-smbclient //172.20.2.42/TelescopeData -U transfer
+smbclient //172.20.2.42/TelescopeData -U transfer%123456
 
 # Or mount directly to your Linux filesystem:
 sudo mkdir -p /mnt/telescope_data
-sudo mount -t cifs //172.20.2.42/TelescopeData /mnt/telescope_data -o username=transfer,uid=1000,gid=1000
+sudo mount -t cifs //172.20.2.42/TelescopeData /mnt/telescope_data -o username=transfer,password=123456,uid=1000,gid=1000,vers=2.1
+```
+
+#### Permanent `/etc/fstab` Mount Entry (Optional):
+```fstab
+//172.20.2.42/TelescopeData  /mnt/telescope_data  cifs  username=transfer,password=123456,uid=1000,gid=1000,vers=2.1,noauto,users,nofail,_netdev  0  0
 ```
 
 ---
