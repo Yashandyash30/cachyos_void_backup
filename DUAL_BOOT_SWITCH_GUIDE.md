@@ -2,7 +2,7 @@
 
 This guide documents the setup where:
 1. **Shortcuts (`to-win` / `to-cachy`):** Jump directly into the target OS without menus.
-2. **rEFInd Memory Sync:** The shortcut also updates rEFInd's memory file (`PreviousBoot`), so the target OS becomes the highlighted default in rEFInd for future boots.
+2. **rEFInd Memory Sync:** The shortcut updates rEFInd's memory file (`PreviousBoot`), so the target OS becomes the highlighted default in rEFInd for future boots.
 3. **Manual Selection in rEFInd:** When booting normally, rEFInd GUI appears with your last-used OS highlighted. If you manually select the other OS in rEFInd, rEFInd updates its memory accordingly.
 
 ---
@@ -13,14 +13,14 @@ This guide documents the setup where:
   rEFInd is instructed to store its remembered last-booted OS on disk at `/EFI/refind/vars/PreviousBoot` instead of motherboard NVRAM.
 - **When running `to-win` in CachyOS:**
   1. Writes `Windows\0` (in UTF-16LE) into `/boot/EFI/refind/vars/PreviousBoot`.
-  2. Sets `efibootmgr -n 0000` (one-shot direct boot).
+  2. Sets `efibootmgr -n 0000` (one-shot direct boot to Windows Boot Manager).
   3. Reboots straight into Windows (no menus).
-  4. On subsequent cold boots, rEFInd loads with Windows highlighted.
+  4. On subsequent cold boots, rEFInd loads with Windows pre-selected.
 - **When running `to-cachy` in Windows:**
   1. Mounts EFI partition (`mountvol S: /s`).
   2. Writes `vmlinuz\0` (in UTF-16LE) into `S:\EFI\refind\vars\PreviousBoot`.
   3. Reboots into CachyOS.
-  4. On subsequent cold boots, rEFInd loads with CachyOS highlighted.
+  4. On subsequent cold boots, rEFInd loads with CachyOS pre-selected.
 
 ---
 
@@ -47,14 +47,40 @@ echo "rEFInd successfully configured: $CONF"
 
 ---
 
-## 3. CachyOS Usage
+## 3. CachyOS Setup & Usage
 
+### A. One-Time Setup (Passwordless Execution)
+Run the pre-generated installer script:
+```bash
+sudo /home/void/setup-switch.sh
+```
+
+*(For reference, `setup-switch.sh` creates `/usr/local/bin/switch-to-windows` and grants passwordless execution via `/etc/sudoers.d/99-switch-to-windows`)*:
+```bash
+#!/bin/bash
+set -e
+
+cat << 'EOF' > /usr/local/bin/switch-to-windows
+#!/bin/bash
+set -e
+mkdir -p /boot/EFI/refind/vars 2>/dev/null || true
+echo -en "Windows\0" | iconv -f UTF-8 -t UTF-16LE > /boot/EFI/refind/vars/PreviousBoot 2>/dev/null || true
+efibootmgr -n 0000
+systemctl reboot
+EOF
+
+chmod 755 /usr/local/bin/switch-to-windows
+echo "%wheel ALL=(ALL) NOPASSWD: /usr/local/bin/switch-to-windows" > /etc/sudoers.d/99-switch-to-windows
+chmod 440 /etc/sudoers.d/99-switch-to-windows
+```
+
+### B. Usage:
 - **Desktop Shortcut:** Double-click **Switch to Windows** (`~/Desktop/switch-to-windows.desktop`).
 - **Fish Terminal:** Run:
   ```fish
   to-win
   ```
-Both execute `/home/void/.local/bin/switch-to-windows`, syncing rEFInd and booting Windows immediately.
+Both execute instantly with no password prompt and reboot directly into Windows.
 
 ---
 
@@ -98,3 +124,18 @@ function to-cachy {
 }
 ```
 Run `to-cachy` in any Administrator PowerShell window.
+
+---
+
+## 5. Troubleshooting & Recovery
+
+- **If Windows Update overwrites the boot order (boots straight to Windows):**
+  1. Boot CachyOS via motherboard boot menu key (`F11`/`F12`).
+  2. Restore rEFInd to `#1`:
+     ```bash
+     sudo efibootmgr -o 0003,0001,0000,0002
+     ```
+     *(or run `sudo refind-install`)*
+
+- **Related Guides:**
+  - Headless SSH & Windows Autologon: [WINDOWS_SSH_AND_AUTOLOGON_GUIDE.md](file:///home/void/cachyos_void_backup/WINDOWS_SSH_AND_AUTOLOGON_GUIDE.md)
