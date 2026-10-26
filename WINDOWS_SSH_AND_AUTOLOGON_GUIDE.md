@@ -140,13 +140,14 @@ if (-not (Get-LocalUser -Name "void" -ErrorAction SilentlyContinue)) {
     net localgroup Administrators void /add
 }
 
-# 2. Authorize all client devices (PC, Phone, Tablet)
+# 2. Authorize all client devices (PC, Phone, Tablet, Laptop)
 $AdminKeyPath = "$env:ProgramData\ssh\administrators_authorized_keys"
 
 $AllKeys = @(
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFyywS3hILOxkMSuGb3YpYZ7cBta0AfkooZoFDO+FhRo void@void-pc",
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEZnXAxtzhYF59Sz97/z2T6IpGiw5pTIZJQrV93ggDDy u0_a183@localhost",
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGYEzY9cPzQwATF19HM2Y4W3Yz7P2ncv1Qw4FxpuGRjp u0_a484@localhost"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGYEzY9cPzQwATF19HM2Y4W3Yz7P2ncv1Qw4FxpuGRjp u0_a484@localhost",
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOuOruXpzfomqFYRbXuWzzAhTPs4VhSbvRAlvFeOWZcl yashandyash30@gmail.com"
 )
 
 Set-Content -Path $AdminKeyPath -Value $AllKeys -Encoding ASCII

@@ -32,21 +32,30 @@ Run this command once in CachyOS terminal:
 sudo bash -c '
 CONF=$(find /boot -name refind.conf 2>/dev/null | head -n 1)
 
-# Enable disk-based memory so shortcuts can sync with rEFInd
+# 1. Enable disk-based memory so shortcuts can sync with rEFInd
 grep -q "^use_nvram" "$CONF" && sed -i "s/^use_nvram.*/use_nvram false/" "$CONF" || echo "use_nvram false" >> "$CONF"
 
-# Remember last selection
+# 2. Remember last selection (defaults to last-used OS across cold boots)
 grep -q "^default_selection" "$CONF" && sed -i "s/^default_selection.*/default_selection \"+\"/" "$CONF" || echo "default_selection \"+\"" >> "$CONF"
 
-# 5-second countdown on normal boot
+# 3. 5-second countdown on normal boot
 grep -q "^timeout" "$CONF" && sed -i "s/^timeout.*/timeout 5/" "$CONF" || echo "timeout 5" >> "$CONF"
 
-# Hide redundant fallback bootx64.efi so rEFInd only displays 2 entries (CachyOS + Windows)
+# 4. Hide redundant fallback bootx64.efi so rEFInd only displays 2 entries (CachyOS + Windows)
 grep -q "^dont_scan_files" "$CONF" && sed -i "s/^dont_scan_files.*/dont_scan_files bootx64.efi/" "$CONF" || echo "dont_scan_files bootx64.efi" >> "$CONF"
+
+# 5. Enable textmode fallback to help passive DP-to-HDMI display adapters wake up during boot
+grep -q "^textmode" "$CONF" || echo "textmode" >> "$CONF"
 
 echo "rEFInd successfully configured: $CONF"
 '
 ```
+
+### What Each Setting Does:
+- **`use_nvram false`**: Stores boot memory on disk (`/EFI/refind/vars/PreviousBoot`) instead of motherboard NVRAM. Required for external scripts to tell rEFInd who has priority.
+- **`default_selection "+"`**: The `"+"` directs rEFInd to default to the last-launched OS.
+- **`dont_scan_files bootx64.efi`**: Omits duplicate Limine fallback binary; leaves a clean 2-icon menu (CachyOS & Windows).
+- **`textmode`**: Forces basic text console mode during pre-boot, preventing passive display adapters from remaining asleep.
 
 ---
 
@@ -188,6 +197,16 @@ function to-cachy {
 
 ## 5. Troubleshooting & Recovery
 
+### A. Black Screen During Boot (Dual Monitors & DP-to-HDMI Adapters)
+If your primary monitor stays black during BIOS and rEFInd:
+- **Root Cause:** AMD GPU firmware (UEFI GOP) sends pre-boot video to the native **`HDMI-A-1` port (MSI MAG 255F monitor)** by default. Passive DP-to-HDMI adapters (HP monitor) stay asleep because they require OS graphics drivers to initialize TMDS signaling over DisplayPort.
+- **Hardware Fix (Recommended):** 
+  - Plug the **HP monitor into native HDMI**.
+  - Plug the **MSI MAG monitor into native DisplayPort** (using a standard DisplayPort cable).
+  - This guarantees BIOS/rEFInd displays on the HP monitor, and unlocks full high-refresh-rate bandwidth on the MSI gaming monitor.
+- **Software Fix:** Enabling `textmode` in `refind.conf` (included in step 2) forces standard video initialization, helping adapters negotiate resolution.
+
+### B. Boot Priority Recovery
 - **If Windows Update overwrites the boot order (boots straight to Windows):**
   1. Boot CachyOS via motherboard boot menu key (`F11`/`F12`).
   2. Restore rEFInd to `#1`:
