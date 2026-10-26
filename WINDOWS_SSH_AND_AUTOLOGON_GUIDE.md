@@ -164,23 +164,28 @@ Write-Host "Windows SSH configured for all devices." -ForegroundColor Green
 
 ### Step 2: Configure Client Devices (`~/.ssh/config`)
 
-Update `~/.ssh/config` on your client devices (Laptop, Tablet, Phone) with this dynamic multi-failover block:
+Update `~/.ssh/config` on your client devices (Laptop, Tablet, Phone, Office PC) with this dynamic multi-failover block:
 
 ```sshconfig
-# 1. Local LAN check (fastest, same IP on both CachyOS & Windows)
-Match host rig,voidrig,void-rig exec "nc -z -w 1 172.21.1.185 22 2>/dev/null"
+# 1. Local LAN check (current Rig IP: 172.21.3.193)
+Match host rig,voidrig,void-rig,sshrig exec "nc -z -w 1 172.21.3.193 22 2>/dev/null"
+    HostName 172.21.3.193
+
+# 2. Local LAN check (alternate Rig IP: 172.21.1.185)
+Match host rig,voidrig,void-rig,sshrig exec "nc -z -w 1 172.21.1.185 22 2>/dev/null"
     HostName 172.21.1.185
 
-# 2. Tailscale CachyOS check (when outside LAN)
-Match host rig,voidrig,void-rig exec "nc -z -w 1 100.106.197.11 22 2>/dev/null"
+# 3. Tailscale CachyOS check (when outside LAN)
+Match host rig,voidrig,void-rig,sshrig exec "nc -z -w 1 100.106.197.11 22 2>/dev/null"
     HostName 100.106.197.11
 
-# 3. Tailscale Windows check (when outside LAN)
-Match host rig,voidrig,void-rig exec "nc -z -w 1 100.67.86.64 22 2>/dev/null"
+# 4. Tailscale Windows check (when outside LAN)
+Match host rig,voidrig,void-rig,sshrig exec "nc -z -w 1 100.67.86.64 22 2>/dev/null"
     HostName 100.67.86.64
 
-# Base configuration for Rig
-Host rig voidrig void-rig
+# Base configuration for Rig (with fallback HostName so it never fails to resolve)
+Host rig voidrig void-rig sshrig
+    HostName 100.106.197.11
     User void
     IdentityFile ~/.ssh/id_ed25519
     StrictHostKeyChecking no
@@ -188,8 +193,12 @@ Host rig voidrig void-rig
     ConnectTimeout 3
 ```
 
+> [!TIP]
+> **Static LAN IP Recommendation:** Because your PC dual-boots CachyOS and Windows, your router's DHCP server may assign different IPs depending on which OS booted first (`172.21.3.193` vs `172.21.1.185`). Setting a **DHCP Reservation (Static IP)** in your home router's admin panel for your PC's Ethernet MAC address ensures both CachyOS and Windows always receive the exact same local IP.
+
 ### Why this works seamlessly:
-- **On Home Wi-Fi/LAN:** Automatically routes to `172.21.1.185` on whichever OS is currently running.
-- **Outside Home (Tailscale):** Automatically pings CachyOS (`100.106.197.11`); if offline, falls back to Windows (`100.67.86.64`).
+- **On Home Wi-Fi/LAN:** Automatically tries `172.21.3.193` and `172.21.1.185` for high-speed local connection.
+- **Outside Home (Tailscale):** Automatically checks CachyOS (`100.106.197.11`); if offline, falls back to Windows (`100.67.86.64`).
+- **Fallback HostName:** Under `Host rig`, `HostName 100.106.197.11` guarantees SSH never throws `Could not resolve hostname rig`.
 - **`StrictHostKeyChecking no` + `UserKnownHostsFile /dev/null`:** Prevents SSH host-key collisions when switching between Linux and Windows.
-- **Typing `sshrig`** on any device now connects transparently to the active OS.
+- **Typing `sshrig`** on any device connects transparently to the active OS.
