@@ -117,26 +117,78 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v AUOptions
 
 ---
 
-## Part 4: Testing from CachyOS
+## Part 4: Seamless `sshrig` from All Devices (Tablet, Laptop, Phone)
 
-In your CachyOS terminal:
+To use the exact same `sshrig` command regardless of whether your rig is running **CachyOS** or **Windows**:
 
-```bash
-# Connect to Windows
-ssh <WindowsUser>@<Windows_IP>
+### The 3 Dual-Boot SSH Challenges Solved:
+1. **Host Key Mismatch:** When OS switches on the same IP, SSH clients see a different host key and block the connection with `REMOTE HOST IDENTIFICATION HAS CHANGED`.
+2. **Tailscale IP Difference:** Tailscale assigns `100.106.197.11` to CachyOS (`void-rig-cachyos`) and `100.67.86.64` to Windows (`void-rig`).
+3. **Username:** All your client configs connect with `User void`.
+
+---
+
+### Step 1: Configure Windows (Run in Admin PowerShell)
+
+Run this block once on Windows to authorize all your devices and match username `void`:
+
+```powershell
+# 1. Ensure user 'void' exists on Windows (if your Windows account is named differently)
+if (-not (Get-LocalUser -Name "void" -ErrorAction SilentlyContinue)) {
+    Write-Host "Creating local user 'void' on Windows..."
+    net user void /add
+    net localgroup Administrators void /add
+}
+
+# 2. Authorize all client devices (PC, Phone, Tablet)
+$AdminKeyPath = "$env:ProgramData\ssh\administrators_authorized_keys"
+
+$AllKeys = @(
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFyywS3hILOxkMSuGb3YpYZ7cBta0AfkooZoFDO+FhRo void@void-pc",
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEZnXAxtzhYF59Sz97/z2T6IpGiw5pTIZJQrV93ggDDy u0_a183@localhost",
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGYEzY9cPzQwATF19HM2Y4W3Yz7P2ncv1Qw4FxpuGRjp u0_a484@localhost"
+)
+
+Set-Content -Path $AdminKeyPath -Value $AllKeys -Encoding ASCII
+
+# Lock down permissions (required by Windows OpenSSH)
+icacls.exe $AdminKeyPath /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"
+
+# Restart OpenSSH
+Restart-Service sshd
+Write-Host "Windows SSH configured for all devices." -ForegroundColor Green
 ```
 
-Add an alias to `~/.config/fish/config.fish` on CachyOS for quick access:
-```fish
-alias sshwin="ssh <WindowsUser>@<Windows_IP>"
+---
+
+### Step 2: Configure Client Devices (`~/.ssh/config`)
+
+Update `~/.ssh/config` on your client devices (Laptop, Tablet, Phone) with this dynamic multi-failover block:
+
+```sshconfig
+# 1. Local LAN check (fastest, same IP on both CachyOS & Windows)
+Match host rig,voidrig,void-rig exec "nc -z -w 1 172.21.1.185 22 2>/dev/null"
+    HostName 172.21.1.185
+
+# 2. Tailscale CachyOS check (when outside LAN)
+Match host rig,voidrig,void-rig exec "nc -z -w 1 100.106.197.11 22 2>/dev/null"
+    HostName 100.106.197.11
+
+# 3. Tailscale Windows check (when outside LAN)
+Match host rig,voidrig,void-rig exec "nc -z -w 1 100.67.86.64 22 2>/dev/null"
+    HostName 100.67.86.64
+
+# Base configuration for Rig
+Host rig voidrig void-rig
+    User void
+    IdentityFile ~/.ssh/id_ed25519
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    ConnectTimeout 3
 ```
 
-### Useful Commands Once Connected via SSH to Windows:
-- Check GPU & system status:
-  ```powershell
-  nvidia-smi
-  ```
-- Reboot back to CachyOS remotely:
-  ```powershell
-  shutdown /r /t 0
-  ```
+### Why this works seamlessly:
+- **On Home Wi-Fi/LAN:** Automatically routes to `172.21.1.185` on whichever OS is currently running.
+- **Outside Home (Tailscale):** Automatically pings CachyOS (`100.106.197.11`); if offline, falls back to Windows (`100.67.86.64`).
+- **`StrictHostKeyChecking no` + `UserKnownHostsFile /dev/null`:** Prevents SSH host-key collisions when switching between Linux and Windows.
+- **Typing `sshrig`** on any device now connects transparently to the active OS.

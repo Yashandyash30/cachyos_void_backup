@@ -41,6 +41,9 @@ grep -q "^default_selection" "$CONF" && sed -i "s/^default_selection.*/default_s
 # 5-second countdown on normal boot
 grep -q "^timeout" "$CONF" && sed -i "s/^timeout.*/timeout 5/" "$CONF" || echo "timeout 5" >> "$CONF"
 
+# Hide redundant fallback bootx64.efi so rEFInd only displays 2 entries (CachyOS + Windows)
+grep -q "^dont_scan_files" "$CONF" && sed -i "s/^dont_scan_files.*/dont_scan_files bootx64.efi/" "$CONF" || echo "dont_scan_files bootx64.efi" >> "$CONF"
+
 echo "rEFInd successfully configured: $CONF"
 '
 ```
@@ -107,6 +110,10 @@ mountvol S: /s
 echo Updating rEFInd priority to CachyOS...
 powershell -NoProfile -Command "[System.IO.File]::WriteAllBytes('S:\EFI\refind\vars\PreviousBoot', [System.Text.Encoding]::Unicode.GetBytes('vmlinuz' + [char]0))"
 mountvol S: /d
+
+echo Setting direct one-shot boot into CachyOS (bypassing rEFInd GUI)...
+powershell -NoProfile -Command "$lines = bcdedit /enum firmware; $id = ''; foreach ($l in $lines) { if ($l -match 'identifier\s+(\{[a-f0-9-]+\})') { $curr = $Matches[1] } if ($l -match 'description\s+UEFI OS') { $id = $curr; break } }; if ($id) { bcdedit /set '{fwbootmgr}' bootsequence $id }"
+
 echo Rebooting into CachyOS...
 shutdown /r /t 0
 '@
@@ -156,6 +163,17 @@ function to-cachy {
     finally {
         # Ensures S: is always unmounted even if writing fails
         mountvol S: /d
+    }
+
+    # Direct one-shot boot to CachyOS (bypasses rEFInd GUI)
+    $lines = bcdedit /enum firmware
+    $id = ""
+    foreach ($l in $lines) {
+        if ($l -match 'identifier\s+(\{[a-f0-9-]+\})') { $curr = $Matches[1] }
+        if ($l -match 'description\s+UEFI OS') { $id = $curr; break }
+    }
+    if ($id) {
+        bcdedit /set "{fwbootmgr}" bootsequence $id
     }
 
     shutdown /r /t 0
