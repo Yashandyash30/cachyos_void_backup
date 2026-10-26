@@ -84,46 +84,87 @@ Both execute instantly with no password prompt and reboot directly into Windows.
 
 ---
 
-## 4. Windows Usage
+## 4. Windows Setup & Usage
 
-### Desktop Shortcut (`SwitchToCachyOS.bat`)
-Create a file named `SwitchToCachyOS.bat` on your Windows Desktop:
+### A. One-Time Setup: Desktop & Start Menu Shortcuts (with Icon)
+Run this script once in Windows **PowerShell as Administrator**. It saves the batch file to `C:\Scripts\` and creates styled shortcuts on both your Desktop and Start Menu:
 
-```bat
+```powershell
+# 1. Create permanent directory and batch script
+$scriptDir = "C:\Scripts"
+if (!(Test-Path $scriptDir)) { New-Item -ItemType Directory -Path $scriptDir -Force }
+$batPath = "$scriptDir\SwitchToCachyOS.bat"
+
+$batContent = @'
 @echo off
 net session >nul 2>&1
 if %errorLevel% neq 0 (
-    powershell -Command "Start-Process cmd -ArgumentList '/c %~fnx0' -Verb RunAs"
+    powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
-
 echo Mounting EFI System Partition...
 mountvol S: /s
-
 echo Updating rEFInd priority to CachyOS...
-powershell -NoProfile -Command "[System.IO.File]::WriteAllBytes('S:\EFI\refind\vars\PreviousBoot', [System.Text.Encoding]::Unicode.GetBytes(\"vmlinuz`0\"))"
-
+powershell -NoProfile -Command "[System.IO.File]::WriteAllBytes('S:\EFI\refind\vars\PreviousBoot', [System.Text.Encoding]::Unicode.GetBytes('vmlinuz' + [char]0))"
 mountvol S: /d
-
 echo Rebooting into CachyOS...
 shutdown /r /t 0
+'@
+
+Set-Content -Path $batPath -Value $batContent -Encoding ASCII
+
+# 2. Create shortcuts with restart icon on Desktop and Start Menu
+$wsh = New-Object -ComObject WScript.Shell
+$shortcutPaths = @(
+    [System.IO.Path]::Combine([Environment]::GetFolderPath('Desktop'), "Switch to CachyOS.lnk"),
+    [System.IO.Path]::Combine([Environment]::GetFolderPath('StartMenu'), "Programs", "Switch to CachyOS.lnk")
+)
+
+foreach ($linkPath in $shortcutPaths) {
+    $shortcut = $wsh.CreateShortcut($linkPath)
+    $shortcut.TargetPath = $batPath
+    $shortcut.WorkingDirectory = $scriptDir
+    $shortcut.Description = "Reboot directly into CachyOS"
+    # Restart/power icon from shell32.dll
+    $shortcut.IconLocation = "$env:SystemRoot\System32\shell32.dll, 238"
+    $shortcut.Save()
+}
+
+Write-Host "Done! Shortcuts created on Desktop and Start Menu." -ForegroundColor Green
 ```
 
-### PowerShell Command (`to-cachy`)
+### B. PowerShell Function (`to-cachy`)
 Open your PowerShell profile in Admin PowerShell:
 ```powershell
 notepad $PROFILE
 ```
-Add:
+Paste this function (includes admin privilege check and robust `try/finally` cleanup so `S:` is never left mounted):
+
 ```powershell
 function to-cachy {
-    mountvol S: /s
-    [System.IO.File]::WriteAllBytes("S:\EFI\refind\vars\PreviousBoot", [System.Text.Encoding]::Unicode.GetBytes("vmlinuz`0"))
-    mountvol S: /d
+    # Check if running as Admin
+    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if (-not $isAdmin) {
+        Write-Error "Please run PowerShell as Administrator to use to-cachy."
+        return
+    }
+
+    try {
+        mountvol S: /s
+        [System.IO.File]::WriteAllBytes("S:\EFI\refind\vars\PreviousBoot", [System.Text.Encoding]::Unicode.GetBytes('vmlinuz' + [char]0))
+    }
+    finally {
+        # Ensures S: is always unmounted even if writing fails
+        mountvol S: /d
+    }
+
     shutdown /r /t 0
 }
 ```
-Run `to-cachy` in any Administrator PowerShell window.
+
+### C. Usage:
+- **GUI:** Double-click **Switch to CachyOS** on Desktop or Start Menu (auto-elevates to Admin, updates rEFInd, reboots).
+- **PowerShell:** Run `to-cachy` in any Administrator PowerShell window.
 
 ---
 
