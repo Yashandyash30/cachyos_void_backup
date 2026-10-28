@@ -1,4 +1,4 @@
-function laptopsunshinescreen -d "Switch which screen Sunshine captures on Laptop (external vs internal)"
+function laptopsunshinescreen --description 'Switch which screen Sunshine captures on Laptop (external vs internal)'
     set target $argv[1]
     switch "$target"
         case internal inbuilt edp edp-1 0
@@ -8,12 +8,12 @@ function laptopsunshinescreen -d "Switch which screen Sunshine captures on Lapto
             set val 1
             set label "External Monitor (HDMI-A-1 / Monitor 1)"
         case status current ""
-            if test (hostname) = "void-pc"
-                ssh void@100.70.236.70 "cat ~/.config/sunshine/sunshine.conf | grep output_name; echo '--- Detected Monitors in Sunshine ---'; grep -m 2 'Monitor [01]' ~/.config/sunshine/sunshine.log"
-            else
-                cat ~/.config/sunshine/sunshine.conf | grep output_name
+            if test (hostname) = "void"
+                cat ~/.config/sunshine/sunshine.conf 2>/dev/null | grep output_name
                 echo "--- Detected Monitors in Sunshine ---"
-                grep -m 2 'Monitor [01]' ~/.config/sunshine/sunshine.log
+                grep -m 2 'Monitor [01]' ~/.config/sunshine/sunshine.log 2>/dev/null
+            else
+                ssh void@100.70.236.70 "cat ~/.config/sunshine/sunshine.conf 2>/dev/null | grep output_name; echo '--- Detected Monitors in Sunshine ---'; grep -m 2 'Monitor [01]' ~/.config/sunshine/sunshine.log 2>/dev/null"
             end
             return
         case "*"
@@ -23,11 +23,11 @@ function laptopsunshinescreen -d "Switch which screen Sunshine captures on Lapto
             return 1
     end
 
-    if test (hostname) = "void-pc"
-        ssh void@100.70.236.70 "sed -i 's/^output_name = .*/output_name = $val/' ~/.config/sunshine/sunshine.conf && systemctl --user restart sunshine.service"
-    else
+    if test (hostname) = "void"
         sed -i "s/^output_name = .*/output_name = $val/" ~/.config/sunshine/sunshine.conf
         systemctl --user restart sunshine.service
+    else
+        ssh void@100.70.236.70 "sed -i 's/^output_name = .*/output_name = $val/' ~/.config/sunshine/sunshine.conf && systemctl --user restart sunshine.service"
     end
     echo "Sunshine on Laptop switched to: $label"
 end

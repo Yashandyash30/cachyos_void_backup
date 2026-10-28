@@ -202,3 +202,26 @@ Host rig voidrig void-rig sshrig
 - **Fallback HostName:** Under `Host rig`, `HostName 100.106.197.11` guarantees SSH never throws `Could not resolve hostname rig`.
 - **`StrictHostKeyChecking no` + `UserKnownHostsFile /dev/null`:** Prevents SSH host-key collisions when switching between Linux and Windows.
 - **Typing `sshrig`** on any device connects transparently to the active OS.
+
+---
+
+## Part 5: Wake-on-LAN (`wakerig`)
+
+Rig Ethernet MAC: `30:56:0f:85:de:b2`
+
+Function installed at `~/.config/fish/functions/wakerig.fish` across all devices:
+
+```fish
+function wakerig
+    echo "Sending Wake-on-LAN to Rig (30:56:0f:85:de:b2)..."
+    wol 30:56:0f:85:de:b2 2>/dev/null
+    wol -i 172.21.3.255 30:56:0f:85:de:b2 2>/dev/null
+    ssh -o ConnectTimeout=2 -o BatchMode=yes -p 8022 u0_a183@100.103.187.97 "wol 30:56:0f:85:de:b2; wol -i 172.21.3.255 30:56:0f:85:de:b2 2>/dev/null" 2>/dev/null
+    echo "Done."
+end
+```
+
+### How `wakerig` works:
+1. **From Home Wi-Fi/LAN:** Sends local broadcast directly to `30:56:0f:85:de:b2` and subnet `172.21.3.255`.
+2. **From Outside (Remote via Tailscale):** Since Tailscale cannot route broadcast packets, it commands the always-on Phone (`100.103.187.97`) to broadcast the packet on your home LAN.
+3. **CachyOS WoL configured:** NetworkManager `802-3-ethernet.wake-on-lan` is set to `magic`, ensuring WoL works whether Rig was shut down from Windows or CachyOS.
