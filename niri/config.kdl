@@ -337,3 +337,8 @@ include "dms/outputs.kdl"
 include "dms/cursor.kdl"
 
 include "dms/windowrules.kdl"
+
+output "sunshine" {
+    position x=0 y=0
+}
+

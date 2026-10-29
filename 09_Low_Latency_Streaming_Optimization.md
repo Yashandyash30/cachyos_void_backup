@@ -91,12 +91,32 @@ Sunshine can automatically detect the FPS that Moonlight requests, switch the ho
 
 #### 1. Rig Setup (`void-rig-cachyos`):
 On the Rig, use the automated dynamic prep script located at `~/.local/bin/sunshine-rig-prep.sh`:
-* Configured in `~/.config/sunshine/apps.json` under **Desktop**:
+* Configured in `~/.config/sunshine/apps.json` under **Desktop**, **Low Res Desktop**, and **Steam Big Picture**:
   * **Do Command:** `/home/void/.local/bin/sunshine-rig-prep.sh do`
   * **Undo Command:** `/home/void/.local/bin/sunshine-rig-prep.sh undo`
-* This script automatically inspects `output_name` in `sunshine.conf`:
-  * If streaming `DP-1` (HP 324pv): drops to `$SUNSHINE_CLIENT_FPS` (e.g. 60 Hz), restores to 100 Hz on disconnect.
-  * If streaming `HDMI-A-1` (MSI MAG 255F): drops to `$SUNSHINE_CLIENT_FPS` (e.g. 60 or 120 Hz), restores to 200 Hz on disconnect.
+* **Dynamic FPS & Boundary Alignment:**
+  * **While Streaming (`do`):** Temporarily maps `DP-1` to `(0, 0)` so Moonlight touch/mouse has zero offset, and switches display to `$SUNSHINE_CLIENT_FPS` (e.g. 60 or 120 Hz).
+  * **When Disconnecting (`undo`):** Automatically restores the physical dual-monitor layout:
+    - MSI MAG 255F (`HDMI-A-1`): Left at `(0, 0)` @ 200 Hz.
+    - HP 324pv (`DP-1`): Right at `(1920, 0)` @ 100 Hz.
+  * **Away Mode:** If MSI is disconnected or powered off before leaving, `DP-1` runs at `(0, 0)` with no dead phantom coordinate space.
+
+* **Rig Sunshine Service Management & Systemd Override:**
+  To eliminate boot race conditions with DMS DankBar and ensure high reliability:
+  * Drop-in: `~/.config/systemd/user/app-dev.lizardbyte.app.Sunshine.service.d/override.conf`:
+    ```ini
+    [Service]
+    ExecStartPre=
+    ExecStartPre=/bin/sleep 10
+    Restart=always
+    RestartSec=3s
+    ```
+  * Quick Fish Commands on Rig:
+    - `resetmonitors`: Restore physical monitor layout (MSI Left, HP Right).
+    - `sunshineweb`: Open Sunshine Web UI (`https://localhost:47990`).
+    - `stopsunshine`: Stop Sunshine service cleanly (e.g. to free VRAM for ComfyUI).
+    - `startsunshine`: Start Sunshine background service.
+    - `restartsunshine`: Restart Sunshine background service.
 
 #### 2. Host PC Setup (`void-pc`):
 1. Open Sunshine Web UI on Host PC: `https://localhost:47990`
